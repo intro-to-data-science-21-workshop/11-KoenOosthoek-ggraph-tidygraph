@@ -1,7 +1,7 @@
 ---
 title: "Tidygraph and ggraph"
 subtitle: "An interactive tutorial for the Intro to Data Science workshop"
-author: "Abrahim and Koen"
+author: "Abhiram and Koen"
 output:
   html_document:
     keep_md: true
@@ -18,7 +18,7 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-Our tutorial will focus on the use of `tidygraph` and `ggraph` We will first tidy same data with `tidygraph` and then use `ggraph` to make same nice graphs.
+Our tutorial will focus on the use of `tidygraph` and `ggraph` We will first tidy some data with `tidygraph` and then use `ggraph` to make some nice graphs.
 
 Lets get started!
 
