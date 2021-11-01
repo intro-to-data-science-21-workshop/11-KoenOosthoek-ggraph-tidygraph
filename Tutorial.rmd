@@ -4,6 +4,7 @@ subtitle: "An interactive tutorial for the Intro to Data Science workshop"
 author: "Abrahim and Koen"
 output:
   html_document:
+    keep_md: true
     df_print: paged
     number_sections: FALSE
     highlight: tango
