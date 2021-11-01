@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Tidygraph and ggraph</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Abhiram and Koen" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
+    <link href="libs/remark-css/default.css" rel="stylesheet" />
+    <link href="libs/remark-css/metropolis.css" rel="stylesheet" />
+    <link href="libs/remark-css/metropolis-fonts.css" rel="stylesheet" />
+    <link rel="stylesheet" href="simons-touch.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Tidygraph and ggraph
+## An interactive tutorial for the Intro to Data Science workshop
+### Abhiram and Koen
+### Hertie School | <a href="https://github.com/intro-to-data-science-21">GRAD-C11/E1339</a>
+
+---
+
+
+
+&lt;style type="text/css"&gt;
+@media print { # print out incremental slides; see https://stackoverflow.com/questions/56373198/get-xaringan-incremental-animations-to-print-to-pdf/56374619#56374619
+  .has-continuation {
+    display: block !important;
+  }
+}
+&lt;/style&gt;
+
+
+
+
+# Table of contents
+
+&lt;br&gt;
+
+1. Introduction to network plots
+
+2. Tidygraph
+
+3. GGraph
+
+---
+class: inverse, center, middle
+name: webdata
+
+# Introduction to network plots
+&lt;html&gt;&lt;div style='float:left'&gt;&lt;/div&gt;&lt;hr color='#EB811B' size=1px style="width:1000px; margin:auto;"/&gt;&lt;/html&gt;
+
+
+---
+# What will we be doing the in the next fifteen minutes?
+
+&lt;br&gt;
+&lt;div align="center"&gt;
+&lt;img src="pics/unnamed-chunk-2-1.png" height=440&gt;
+&lt;/div&gt;
+
+
+---
+# What are network plots?
+
+### Network plots let you show relationships
+
+- Network plots show interconnections between a set of entities 
+- You can think of the following examples:
+  - Social media: visualizing how the people you follow on Twitter have interconnections (e.g. through professions or personal interests)
+  - Language: visualizing how languages and language families are interconnected to each other. Often, NLP is needed for such applications
+  - Business: visualizing how certain markets or companies are interconnected, for instance through supply chains
+
+### Why do we want to plot networks?
+- To make interconnections comprehensible 
+- To find new patterns or relationships among networks
+- To make you look smart
+
+---
+#Nodes and edges
+
+.pull-left[
+
+&lt;br&gt;
+&lt;div align="center"&gt;
+&lt;img src="pics/pic2.png" height=440&gt;
+&lt;/div&gt;
+
+]
+
+--
+
+.pull-right[
+
+### The requirements of a network plot
+
+- In essence, you can use any type of data as long as meets the following conditions:
+  - You have a data point: a node (or vertice)
+  - You have a connection between the nodes: an edge (or line)
+- If you want to plot a network, this means that you need to have two categories of data: (1) data on the nodes and (2) data on a meaningful distance between the nodes e.g. edges.
+
+]
+
+---
+
+class: inverse, center, middle
+name: webdata
+
+# Tidygraph
+&lt;html&gt;&lt;div style='float:left'&gt;&lt;/div&gt;&lt;hr color='#EB811B' size=1px style="width:1000px; margin:auto;"/&gt;&lt;/html&gt;
+
+---
+
+# Tidygraph: Let's turn to R!
+
+.pull-left[
+
+### Preparation of data
+
+- We need to structure our data to make it ready for network plots
+- For this purpose, we use the `tidygraph` package. 
+- Let's see how this works in R:
+&lt;br&gt;
+&lt;div align="left"&gt;
+&lt;img src="pics/pic3.png" height=320&gt;
+&lt;/div&gt;
+
+]
+
+--
+.pull-right[
+
+### Nodes and edges
+
+- Two lists are created:
+  1. A node list containing a single column with the IDs or names of the nodes
+  2. An edge list containing a minimum of two columns - showing the relationships between 'from' and 'to'. `Tidygraph` uses the row position as an ID number to identify the 'from' and 'to' nodes (in this case: train stations)
+  
+### The return of `dplyr`!
+- If you want to manipulate data on the node or edge list, you can simply do so by calling the `tidygraph::activate()` function. 
+- Then R knows which list you want to work with. After calling this function, you can use `dplyr` on your list!
+
+]
+
+---
+# Example of dplyr manipulation with tidygraph
+
+.pull-left[
+
+
+
+```r
+R&gt; library(tidygraph)
+```
+
+```
+## 
+## Attaching package: 'tidygraph'
+```
+
+```
+## The following object is masked from 'package:stats':
+## 
+##     filter
+```
+
+```r
+R&gt; # tbl_graph &lt;- as_tbl_graph(df)
+R&gt; 
+R&gt; # tbl_graph %&gt;%
+R&gt;   # activate(nodes) %&gt;%
+R&gt;   # mutate(...) %&gt;%
+R&gt;   # activate(edges) %&gt;%
+R&gt;   # mutate(...)
+```
+
+]
+
+--
+
+.pull-right[
+
+We will do this in R just a second! 
+
+The point is: `tidygraph` provides a way to switch between the two tables and provides dplyr verbs for manipulating them
+
+]
+
+---
+class: inverse, center, middle
+name: html
+
+# GGraph
+
+&lt;html&gt;&lt;div style='float:left'&gt;&lt;/div&gt;&lt;hr color='#EB811B' size=1px style="width:1000px; margin:auto;"/&gt;&lt;/html&gt;
+
+
+---
+# GGraph
+
+.pull-left[
+
+### What is `ggraph`?
+- `ggraph` is an extension of `ggplot2` aimed at supporting relational data structures such as networks, graphs, and trees
+- The spatial position of nodes (end thereby edges) are more often defined by the graph structure through a layout function, rather than mapped to specific parameters
+- This makes ggraph relatively easy to use
+
+]
+
+--
+
+.pull-right[
+
+### Once we have "tidygraphed" our data, we're good to go!
+
+```r
+R&gt; # ggraph(data, layout = 'kk') +
+R&gt;   # geom_edge_link() + 
+R&gt;   # geom_node_point() +
+R&gt;   # theme_graph()
+```
+
+&lt;br&gt;
+&lt;div align="centre"&gt;
+&lt;img src="pics/pic6.png" height=250&gt;
+&lt;/div&gt;
+
+]
+
+---
+
+# A cool example
+&lt;br&gt;
+&lt;div align="center"&gt;
+&lt;img src="pics/pic8.png" height=520&gt;
+&lt;/div&gt;
+
+---
+
+# A second cool example (credits to Duval Alexandre)
+&lt;br&gt;
+&lt;div align="center"&gt;
+&lt;img src="pics/pic7.png" height=560&gt;
+&lt;/div&gt;
+
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false,
+"ratio": "16:9",
+"hash": true
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
