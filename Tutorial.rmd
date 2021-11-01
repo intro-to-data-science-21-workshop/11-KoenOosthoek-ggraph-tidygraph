@@ -1,0 +1,176 @@
+---
+title: "Tidygraph and ggraph"
+subtitle: "An interactive tutorial for the Intro to Data Science workshop"
+author: "Abrahim and Koen"
+output:
+  html_document:
+    df_print: paged
+    number_sections: FALSE
+    highlight: tango
+    theme: lumen
+    toc_depth: 3
+    css: custom.css 
+    self_contained: false
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Our tutorial will focus on the use of `tidygraph` and `ggraph` We will first tidy same data with `tidygraph` and then use `ggraph` to make same nice graphs.
+
+Lets get started!
+
+Load the following packages:
+
+```{r, message=F}
+library(tidygraph)
+library(ggraph)
+library(tidyverse)
+library(readr)
+```
+
+We will work with some data on train connections in France. Please load the dataset:
+
+```{r}
+url <- "https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2019/2019-02-26/small_trains.csv"
+small_trains <- read_csv(url)
+```
+
+Let's prepare our data. We first use `dplyr` to manipulate our data to get the average journey time between the stations. 
+
+```{r}
+routes <- small_trains %>%
+  group_by(departure_station, arrival_station) %>%
+  summarise(journey_time = mean(journey_time_avg)) %>%
+  ungroup() %>%
+  mutate(from = departure_station, 
+         to = arrival_station) %>%
+  select(from, to, journey_time)
+```
+
+We can't just use a regular dataframe to create network graphs. Rather, we need to use the `tidygraph` package to prepare our data for our graphs. We can do this with a simple command:
+
+```{r}
+graph_routes <- as_tbl_graph(routes)
+graph_routes
+```
+
+We can see that the as_tbl_graph argument has created two types of data: 1) the 'Node Data' containing information on the train station and the 2) 'Edge Data' containing information on the departure and arrival station and the average time of travel between them. 
+
+Next, we "activate" the nodes. When we manipulate data, it is necessary to specify which table is referenced: the "Node" or the "Edge" table. Here, we select the Node table. We also create two new string variables: a second one named 'title' with lower case strings and a third one named 'label' which puts parts of the names of train stations that have multiple words (e.g. "Aix en Provence Tgv") on a new line. The latter could come in handy for visualization purposes.
+
+```{r}
+graph_routes <- graph_routes %>%
+  activate(nodes) %>%
+  mutate(
+    title = str_to_title(name),
+    label = str_replace_all(title, " ", "\n")
+    )
+
+graph_routes
+
+```
+
+As the previous bit of code already showed, we can combine `ggplot2` with `tidygraph` and `ggraph`! Let's choose a minimal `ggplot2` style:
+
+```{r}
+library(ggplot2)
+
+thm <- theme_minimal() +
+  theme(
+    legend.position = "none",
+     axis.title = element_blank(),
+     axis.text = element_blank(),
+     panel.grid = element_blank(),
+     panel.grid.major = element_blank(),
+  ) 
+
+theme_set(thm)
+```
+
+Let's plot our network graph!
+
+```{r}
+graph_routes %>%
+  ggraph(layout = "auto") +
+    geom_node_point() +
+    geom_edge_diagonal() # a diagonal creating a pleasing fan-in, fan-out line
+```
+
+We can also use a different layout without the curvy lines:
+
+```{r}
+graph_routes %>%
+  ggraph(layout = "kk") +
+    geom_node_point() +
+    geom_edge_link(filter = 'mutual', # draw edges as straight lines between nodes
+      colour = 'grey',
+      alpha = 0.5)
+```
+
+Or just use different layouts which change every time you enter the code!
+
+```{r}
+graph_routes %>%
+  ggraph(layout = "fr") +
+    geom_node_point() +
+    geom_edge_link(filter = 'mutual',
+      colour = 'grey',
+      alpha = 0.5)
+```
+
+
+We can also customize our nodes and edges:
+
+```{r}
+graph_routes %>%
+  ggraph(layout = "kk") +
+    geom_node_point(colour = "pink") +
+    geom_edge_diagonal() +
+    geom_edge_link0(colour = "blue") +
+    geom_edge_fan2(filter = 'mutual',
+      colour = 'grey',
+      alpha = 0.5)
+```
+
+Or add different node shapes and change their sizes! ('fr' = Fruchterman and Reingold algorithm)
+
+```{r}
+graph_routes %>%
+  ggraph(layout = "kk") +
+    geom_node_point(colour = "red", size = 9) +
+    geom_edge_link0(colour = "brown", width = 1.5) +
+    geom_edge_fan2(filter = 'mutual',
+      colour = 'grey',
+      alpha = 0.5)
+```
+
+
+```{r}
+graph_routes %>%
+  ggraph(layout = "kk") +
+    geom_node_point(colour = "red", shape = 3, size = 9) + # add different node shapes
+    geom_edge_link0(colour = "brown") +
+    geom_edge_fan2(filter = 'mutual',
+      colour = 'grey',
+      alpha = 0.5)
+```
+
+
+Let's add some names and colour to make our network plot more easy to read!
+
+```{r}
+graph_routes %>%
+  ggraph(layout = "kk") +
+    geom_node_text(aes(label = label, color = name), size = 3) +
+    geom_edge_diagonal(color = "gray", alpha = 0.4) 
+```
+
+What do you think? If you want to have another tutorial that is a bit more advanced, check it this one: http://users.dimi.uniud.it/~massimo.franceschet/ns/syllabus/make/ggraph/ggraph.html
+
+Happy network plotting!
+
+Credits to Edgar Ruiz: https://rviews.rstudio.com/2019/03/06/intro-to-graph-analysis/
+
+
